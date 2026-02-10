@@ -99,7 +99,9 @@ export default function Home() {
   const [cartLoaded, setCartLoaded] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "ok" | "error" } | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!toast) return;
@@ -157,6 +159,11 @@ export default function Home() {
         `/api/cart?userId=${encodeURIComponent(authUserId)}`,
       );
       if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        setToast({
+          message: payload.error ?? "Failed to load cart",
+          type: "error",
+        });
         setCartLoaded(true);
         return;
       }
@@ -175,7 +182,7 @@ export default function Home() {
   useEffect(() => {
     if (!authUserId || !cartLoaded) return;
     const persistCart = async () => {
-      await fetch("/api/cart", {
+      const response = await fetch("/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -186,6 +193,13 @@ export default function Home() {
           })),
         }),
       });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        setToast({
+          message: payload.error ?? "Failed to save cart",
+          type: "error",
+        });
+      }
     };
     persistCart();
   }, [authUserId, cart, cartLoaded]);
@@ -336,8 +350,12 @@ export default function Home() {
           ...prev,
           `Order create failed: ${message.error ?? orderResponse.status}`,
         ]);
+        setToast({
+          message: message.error ?? "Order failed",
+          type: "error",
+        });
       } else {
-        setToast("Order placed. Receipts and order saved.");
+        setToast({ message: "Order placed. Receipts and order saved.", type: "ok" });
       }
     }
 
@@ -392,9 +410,6 @@ export default function Home() {
             >
               Inventory
             </Link>
-            <span className="rounded-full border border-white/15 px-3 py-1 text-xs">
-              Budget-aware
-            </span>
             {/* @ts-expect-error custom element */}
             <appkit-button />
           </div>
@@ -647,27 +662,6 @@ export default function Home() {
             </div>
 
             <div className="rounded-3xl border border-white/10 bg-slate-900/70 p-6">
-              <h3 className="text-lg font-semibold">Gemini Bundle Notes</h3>
-              <p className="mt-2 text-sm text-slate-300">
-                Ask Gemini to suggest or summarize the bundle.
-              </p>
-              <textarea
-                value={geminiPrompt}
-                onChange={(event) => setGeminiPrompt(event.target.value)}
-                className="mt-4 min-h-[120px] w-full rounded-2xl border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white"
-              />
-              <button
-                onClick={runGemini}
-                className="mt-4 w-full rounded-full border border-cyan-200/60 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-200/10"
-              >
-                {geminiLoading ? "Generating..." : "Generate Draft"}
-              </button>
-              {geminiText && (
-                <p className="mt-3 text-sm text-slate-200">{geminiText}</p>
-              )}
-            </div>
-
-            <div className="rounded-3xl border border-white/10 bg-slate-900/70 p-6">
               <h3 className="text-lg font-semibold">Trace Preview</h3>
               <p className="mt-2 text-sm text-slate-300">
                 Each step logs 402 response, payment, and retry.
@@ -771,8 +765,14 @@ export default function Home() {
       )}
 
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 rounded-2xl border border-cyan-200/40 bg-slate-950/90 px-4 py-3 text-sm text-cyan-100 shadow-lg">
-          {toast}
+        <div
+          className={`fixed bottom-6 right-6 z-50 rounded-2xl border px-4 py-3 text-sm shadow-lg ${
+            toast.type === "ok"
+              ? "border-cyan-200/40 bg-slate-950/90 text-cyan-100"
+              : "border-rose-300/40 bg-rose-500/10 text-rose-200"
+          }`}
+        >
+          {toast.message}
         </div>
       )}
     </div>

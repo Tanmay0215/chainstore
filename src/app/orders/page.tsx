@@ -15,6 +15,7 @@ export default function OrdersPage() {
   const [email, setEmail] = useState<string | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -30,6 +31,8 @@ export default function OrdersPage() {
 
       const response = await fetch(`/api/orders?userId=${encodeURIComponent(id)}`);
       if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        setError(payload.error ?? "Failed to load orders");
         setLoading(false);
         return;
       }
@@ -61,6 +64,12 @@ export default function OrdersPage() {
           </div>
         )}
 
+        {error && (
+          <div className="mt-6 rounded-2xl border border-rose-300/30 bg-rose-500/10 p-6 text-sm text-rose-200">
+            {error}
+          </div>
+        )}
+
         {email && !loading && orders.length === 0 && (
           <div className="mt-6 rounded-2xl border border-white/10 bg-slate-900/60 p-6 text-sm text-slate-300">
             No orders yet. Run a purchase to create your first order.
@@ -89,6 +98,12 @@ export default function OrdersPage() {
                   </span>
                 </div>
                 <p className="mt-2 text-xs text-slate-500">{order.id}</p>
+                <a
+                  href={`/orders/${order.id}`}
+                  className="mt-3 inline-flex rounded-full border border-white/15 px-3 py-1 text-xs text-slate-200 hover:border-cyan-200/60"
+                >
+                  View details
+                </a>
               </div>
             ))}
           </div>

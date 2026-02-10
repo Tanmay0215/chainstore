@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import { BotIcon } from "lucide-react";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-sans",
@@ -34,7 +35,7 @@ export default function RootLayout({
             className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-cyan-200/40 bg-slate-950/90 text-cyan-100 shadow-lg transition hover:scale-105 hover:border-cyan-200"
             aria-label="Open chat"
           >
-            Chat
+            <BotIcon />
           </a>
         </Providers>
       </body>

@@ -48,3 +48,37 @@ on budget and cart value, and every receipt is stored for auditability.
 - `/api/tools/*` simulates commerce tools with x402 402 → pay → retry.
 - `/api/pay` is a stub for CDP wallet signing.
 - `contracts/SpendRegistry.sol` is a placeholder for onchain logging.
+
+## Database Setup
+
+The application uses Supabase for data persistence. The database schema includes tables for receipts, cart management, orders, and inventory tracking.
+
+### Quick Setup
+
+Run the seed script in your Supabase SQL Editor:
+
+```bash
+# Copy the contents of supabase/seed.sql and run in Supabase SQL Editor
+# Or use the Supabase CLI:
+supabase db reset  # This will run migrations and seed data
+```
+
+### Schema Overview
+
+The database consists of 5 main tables:
+
+| Table | Purpose |
+|-------|---------|
+| `receipts` | Tracks x402 payment receipts for each agentic step |
+| `cart_items` | Stores user shopping cart items |
+| `orders` | Records completed orders with totals and status |
+| `order_items` | Line items for each order |
+| `inventory_items` | Product catalog with stock levels |
+
+**Note:** The complete schema with seed data is available in [`supabase/seed.sql`](./supabase/seed.sql).
+
+### Initial Inventory
+
+The seed data includes 6 sample products:
+- Wool Desk Mat, Focus Lamp, Studio Headset
+- Thermal Mug, Analog Notebook, Laptop Stand

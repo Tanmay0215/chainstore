@@ -56,20 +56,25 @@ CREATE TABLE IF NOT EXISTS order_items (
 CREATE TABLE IF NOT EXISTS inventory_items (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at timestamptz DEFAULT now(),
+  product_id text NOT NULL,
   name text NOT NULL,
   sku text NOT NULL,
   on_hand integer NOT NULL
 );
+
+-- Create index on product_id for efficient lookups
+CREATE INDEX IF NOT EXISTS inventory_items_product_id_idx
+  ON inventory_items (product_id);
 
 -- ============================================================================
 -- SEED DATA: Inventory Items
 -- ============================================================================
 
 -- Populate inventory with initial products
-INSERT INTO inventory_items (name, sku, on_hand) VALUES
-  ('Wool Desk Mat', 'WM-348', 42),
-  ('Focus Lamp', 'FL-221', 18),
-  ('Studio Headset', 'SH-110', 9),
-  ('Thermal Mug', 'TM-404', 27),
-  ('Analog Notebook', 'AN-212', 64),
-  ('Laptop Stand', 'LS-880', 12);
+INSERT INTO inventory_items (product_id, name, sku, on_hand) VALUES
+  ('desk-mat', 'Wool Desk Mat', 'WM-348', 42),
+  ('lamp', 'Focus Lamp', 'FL-221', 18),
+  ('headset', 'Studio Headset', 'SH-110', 9),
+  ('mug', 'Thermal Mug', 'TM-404', 27),
+  ('notebook', 'Analog Notebook', 'AN-212', 64),
+  ('stand', 'Laptop Stand', 'LS-880', 12);

@@ -62,5 +62,36 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: itemsError.message }, { status: 500 });
   }
 
+  for (const item of items as Array<{ productId: string; qty: number }>) {
+    const { data: inventoryRow, error: inventoryError } = await supabaseServer
+      .from("inventory_items")
+      .select("id, on_hand")
+      .eq("product_id", item.productId)
+      .single();
+
+    if (inventoryError || !inventoryRow) {
+      return NextResponse.json(
+        { error: `Inventory missing for ${item.productId}` },
+        { status: 500 },
+      );
+    }
+
+    if (inventoryRow.on_hand < item.qty) {
+      return NextResponse.json(
+        { error: `Insufficient inventory for ${item.productId}` },
+        { status: 400 },
+      );
+    }
+
+    const { error: updateError } = await supabaseServer
+      .from("inventory_items")
+      .update({ on_hand: inventoryRow.on_hand - item.qty })
+      .eq("id", inventoryRow.id);
+
+    if (updateError) {
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
+    }
+  }
+
   return NextResponse.json({ ok: true, orderId: order.id });
 }
