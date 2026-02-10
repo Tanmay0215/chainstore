@@ -28,9 +28,9 @@ const pricing: Record<
 
 export async function POST(
   request: Request,
-  { params }: { params: { step: string } },
+  { params }: { params: Promise<{ step: string }> },
 ) {
-  const step = params.step;
+  const { step } = await params;
   const tool = pricing[step];
 
   if (!tool) {

@@ -51,9 +51,12 @@ export async function fetchWith402(
 export function shouldPayStep(
   budget: number,
   price: number,
-  intentScore: number,
+  cartSubtotal: number,
+  minCartValue: number,
 ) {
   if (budget < price) return { pay: false, reason: "Over budget" };
-  if (intentScore < 65) return { pay: false, reason: "Intent score too low" };
+  if (cartSubtotal < minCartValue) {
+    return { pay: false, reason: "Cart value below threshold" };
+  }
   return { pay: true, reason: "Proceed" };
 }
