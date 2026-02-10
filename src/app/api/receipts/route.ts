@@ -3,7 +3,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { stepId, price, status, receiptId } = body ?? {};
+  const { stepId, price, status, receiptId, orderId } = body ?? {};
 
   if (!stepId || typeof price !== "number" || !status) {
     return NextResponse.json({ error: "Invalid receipt" }, { status: 400 });
@@ -14,6 +14,7 @@ export async function POST(request: Request) {
     price,
     status,
     receipt_id: receiptId ?? null,
+    order_id: orderId ?? null,
   });
 
   if (error) {

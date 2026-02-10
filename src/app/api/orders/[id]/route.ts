@@ -26,5 +26,20 @@ export async function GET(
     return NextResponse.json({ error: itemsError.message }, { status: 500 });
   }
 
-  return NextResponse.json({ order, items });
+  const { data: receipts, error: receiptsError } = await supabaseServer
+    .from("receipts")
+    .select("step_id, price, status, receipt_id, created_at")
+    .eq("order_id", id)
+    .order("created_at", { ascending: true });
+
+  if (receiptsError) {
+    return NextResponse.json({
+      order,
+      items,
+      receipts: [],
+      warning: receiptsError.message,
+    });
+  }
+
+  return NextResponse.json({ order, items, receipts: receipts ?? [] });
 }

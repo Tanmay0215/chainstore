@@ -254,6 +254,12 @@ export default function Home() {
     let remaining = budget;
     const nextTrace: TraceStep[] = [];
 
+    const receiptQueue: Array<{
+      stepId: string;
+      price: number;
+      receiptId?: string;
+    }> = [];
+
     for (const step of baseSteps) {
       const { pay, reason } = shouldPayStep(
         remaining,
@@ -300,24 +306,11 @@ export default function Home() {
           receipt: payload?.receipt?.id,
         });
 
-        const receiptResponse = await fetch("/api/receipts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            stepId: step.id,
-            price: step.price,
-            status: "paid",
-            receiptId: payload?.receipt?.id,
-          }),
+        receiptQueue.push({
+          stepId: step.id,
+          price: step.price,
+          receiptId: payload?.receipt?.id,
         });
-
-        if (!receiptResponse.ok) {
-          const message = await receiptResponse.json().catch(() => ({}));
-          setErrors((prev) => [
-            ...prev,
-            `Receipt log failed (${step.id}): ${message.error ?? receiptResponse.status}`,
-          ]);
-        }
       } catch (error) {
         nextTrace.push({
           name: step.name,
@@ -329,6 +322,7 @@ export default function Home() {
     }
 
     const allPaid = nextTrace.every((step) => step.status === "paid");
+    let orderId: string | null = null;
     if (authUserId && cartItems.length > 0) {
       const orderResponse = await fetch("/api/orders", {
         method: "POST",
@@ -355,6 +349,30 @@ export default function Home() {
           type: "error",
         });
       } else {
+        const payload = await orderResponse.json().catch(() => ({}));
+        orderId = payload.orderId ?? null;
+        for (const receipt of receiptQueue) {
+          const receiptResponse = await fetch("/api/receipts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              stepId: receipt.stepId,
+              price: receipt.price,
+              status: "paid",
+              receiptId: receipt.receiptId,
+              orderId,
+            }),
+          });
+          if (!receiptResponse.ok) {
+            const message = await receiptResponse.json().catch(() => ({}));
+            setErrors((prev) => [
+              ...prev,
+              `Receipt log failed (${receipt.stepId}): ${
+                message.error ?? receiptResponse.status
+              }`,
+            ]);
+          }
+        }
         setToast({ message: "Order placed. Receipts and order saved.", type: "ok" });
       }
     }

@@ -17,6 +17,25 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const downloadReceipts = async (orderId: string) => {
+    const response = await fetch(`/api/orders/${orderId}`);
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      setError(payload.error ?? "Failed to fetch receipts");
+      return;
+    }
+    const payload = await response.json();
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `order-${orderId}-receipts.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   useEffect(() => {
     const loadOrders = async () => {
       const { data } = await supabaseClient.auth.getUser();
@@ -104,6 +123,12 @@ export default function OrdersPage() {
                 >
                   View details
                 </a>
+                <button
+                  onClick={() => downloadReceipts(order.id)}
+                  className="mt-3 ml-2 inline-flex rounded-full border border-white/15 px-3 py-1 text-xs text-slate-200 hover:border-cyan-200/60"
+                >
+                  Download receipts
+                </button>
               </div>
             ))}
           </div>
