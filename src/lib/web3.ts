@@ -1,7 +1,8 @@
 import { createConfig, http } from "wagmi";
 import { mainnet, sepolia } from "wagmi/chains";
+import { skaleChain } from "./skale/chain";
 
-export const chains = [mainnet, sepolia] as const;
+export const chains = [mainnet, sepolia, skaleChain] as const;
 
 export const wagmiConfig = createConfig({
   chains,
@@ -9,5 +10,6 @@ export const wagmiConfig = createConfig({
   transports: {
     [mainnet.id]: http(),
     [sepolia.id]: http(),
+    [skaleChain.id]: http(),
   },
 });
