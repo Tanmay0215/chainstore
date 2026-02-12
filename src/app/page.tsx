@@ -14,10 +14,10 @@ type TraceStep = {
 };
 
 const baseSteps = [
-  { id: "quote", name: "Dynamic Price Quote", price: 4 },
-  { id: "reserve", name: "Inventory Hold", price: 7 },
-  { id: "checkout", name: "Checkout Fee", price: 6 },
-  { id: "fulfill", name: "Fulfillment", price: 5 },
+  { id: "quote", name: "Dynamic Price Quote", price: 0.0004 },
+  { id: "reserve", name: "Inventory Hold", price: 0.0007 },
+  { id: "checkout", name: "Checkout Fee", price: 0.0006 },
+  { id: "fulfill", name: "Fulfillment", price: 0.0005 },
 ];
 
 type Product = {
@@ -33,48 +33,48 @@ const products: Product[] = [
     id: "desk-mat",
     name: "Wool Desk Mat",
     description: "Soft grip surface, 80x35cm",
-    price: 18,
+    price: 0.018,
     tag: "Workspace",
   },
   {
     id: "lamp",
     name: "Focus Lamp",
     description: "Adjustable warm light",
-    price: 22,
+    price: 0.022,
     tag: "Lighting",
   },
   {
     id: "headset",
     name: "Studio Headset",
     description: "Noise isolation + mic",
-    price: 28,
+    price: 0.028,
     tag: "Audio",
   },
   {
     id: "mug",
     name: "Thermal Mug",
     description: "Stays hot for 6 hours",
-    price: 14,
+    price: 0.014,
     tag: "Comfort",
   },
   {
     id: "notebook",
     name: "Analog Notebook",
     description: "Grid pages, 120 sheets",
-    price: 12,
+    price: 0.012,
     tag: "Focus",
   },
   {
     id: "stand",
     name: "Laptop Stand",
     description: "Aluminum, 6 height levels",
-    price: 24,
+    price: 0.024,
     tag: "Ergonomics",
   },
 ];
 
 export default function Home() {
-  const [budget, setBudget] = useState(50);
+  const [budget, setBudget] = useState(0.5);
   const [targetCount, setTargetCount] = useState(3);
   const [minCartValue, setMinCartValue] = useState(0);
   const [trace, setTrace] = useState<TraceStep[]>([]);
@@ -92,16 +92,17 @@ export default function Home() {
   const [authEmail, setAuthEmail] = useState("");
   const [authUser, setAuthUser] = useState<string | null>(null);
   const [authUserId, setAuthUserId] = useState<string | null>(null);
-  const [authStatus, setAuthStatus] = useState<"idle" | "loading" | "error" | "ok">(
-    "idle",
-  );
+  const [authStatus, setAuthStatus] = useState<
+    "idle" | "loading" | "error" | "ok"
+  >("idle");
   const [authMessage, setAuthMessage] = useState("");
   const [cartLoaded, setCartLoaded] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
-  const [toast, setToast] = useState<{ message: string; type: "ok" | "error" } | null>(
-    null,
-  );
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "ok" | "error";
+  } | null>(null);
 
   useEffect(() => {
     if (!toast) return;
@@ -169,9 +170,11 @@ export default function Home() {
       }
       const payload = await response.json();
       const nextCart: Record<string, number> = {};
-      (payload.items ?? []).forEach((item: { productId: string; qty: number }) => {
-        nextCart[item.productId] = item.qty;
-      });
+      (payload.items ?? []).forEach(
+        (item: { productId: string; qty: number }) => {
+          nextCart[item.productId] = item.qty;
+        },
+      );
       setCart(nextCart);
       setCartLoaded(true);
     };
@@ -373,7 +376,10 @@ export default function Home() {
             ]);
           }
         }
-        setToast({ message: "Order placed. Receipts and order saved.", type: "ok" });
+        setToast({
+          message: "Order placed. Receipts and order saved.",
+          type: "ok",
+        });
       }
     }
 
@@ -400,21 +406,19 @@ export default function Home() {
   };
 
   return (
-      <div className="min-h-screen bg-[#0b0c10] text-slate-100">
-        <div className="relative overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,_rgba(56,189,248,0.35),_transparent_40%),radial-gradient(circle_at_80%_10%,_rgba(244,114,182,0.25),_transparent_35%)]" />
-          <div className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-emerald-400/10 blur-[120px]" />
-          <div className="pointer-events-none absolute right-[-120px] top-1/2 h-[520px] w-[520px] rounded-full bg-indigo-500/15 blur-[160px]" />
+    <div className="min-h-screen bg-[#0b0c10] text-slate-100">
+      <div className="relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,_rgba(56,189,248,0.35),_transparent_40%),radial-gradient(circle_at_80%_10%,_rgba(244,114,182,0.25),_transparent_35%)]" />
+        <div className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-emerald-400/10 blur-[120px]" />
+        <div className="pointer-events-none absolute right-[-120px] top-1/2 h-[520px] w-[520px] rounded-full bg-indigo-500/15 blur-[160px]" />
 
-          <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-8">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">
+        <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-8">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-cyan-200/70">
               x402 agentic commerce
-              </p>
-              <h1 className="font-serif text-3xl text-white">
-                Agentic Commerce
-              </h1>
-            </div>
+            </p>
+            <h1 className="font-serif text-3xl text-white">Agentic Commerce</h1>
+          </div>
           <div className="flex items-center gap-3">
             <Link
               href="/orders"
@@ -502,7 +506,9 @@ export default function Home() {
                 <p className="text-xs uppercase tracking-[0.25em] text-cyan-200/70">
                   Toolchain
                 </p>
-                <p className="mt-2 text-lg">Quote → Reserve → Checkout → Fulfill</p>
+                <p className="mt-2 text-lg">
+                  Quote → Reserve → Checkout → Fulfill
+                </p>
               </div>
             </div>
 
@@ -512,7 +518,7 @@ export default function Home() {
                   Per-Run Fees
                 </p>
                 <p className="mt-2 text-2xl font-semibold text-white">
-                  ${projectedSpend}
+                  {projectedSpend.toFixed(4)} ETH
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -528,7 +534,7 @@ export default function Home() {
                   Min Cart / Spent
                 </p>
                 <p className="mt-2 text-2xl font-semibold text-white">
-                  ${minCartValue}+ / ${spent}
+                  {minCartValue}+ / {spent.toFixed(4)} ETH
                 </p>
               </div>
             </div>
@@ -551,7 +557,7 @@ export default function Home() {
                         {product.tag}
                       </span>
                       <span className="text-lg font-semibold text-white">
-                        ${product.price}
+                        {product.price} ETH
                       </span>
                     </div>
                     <h4 className="mt-4 text-lg font-semibold text-white">
@@ -590,12 +596,12 @@ export default function Home() {
                     <div className="flex items-center justify-between">
                       <span>{item.name}</span>
                       <span className="text-cyan-200/80">
-                        ${item.lineTotal}
+                        {item.lineTotal.toFixed(3)} ETH
                       </span>
                     </div>
                     <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
                       <span>
-                        {item.qty} × ${item.price}
+                        {item.qty} × {item.price} ETH
                       </span>
                       <div className="flex gap-2">
                         <button
@@ -618,7 +624,9 @@ export default function Home() {
               <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Subtotal</span>
-                  <span className="text-white">${cartSubtotal}</span>
+                  <span className="text-white">
+                    {cartSubtotal.toFixed(3)} ETH
+                  </span>
                 </div>
               </div>
               <button
@@ -644,14 +652,12 @@ export default function Home() {
               </p>
               <div className="mt-5 grid gap-4 text-sm">
                 <label className="flex flex-col gap-2">
-                  Budget (USDC)
+                  Budget (ETH)
                   <input
                     type="number"
                     className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-white"
                     value={budget}
-                    onChange={(event) =>
-                      setBudget(Number(event.target.value))
-                    }
+                    onChange={(event) => setBudget(Number(event.target.value))}
                   />
                 </label>
                 <label className="flex flex-col gap-2">
@@ -707,7 +713,7 @@ export default function Home() {
                         }
                       >
                         {step.status === "paid"
-                          ? `$${step.price}`
+                          ? `${step.price.toFixed(4)} ETH`
                           : step.status === "error"
                             ? "Error"
                             : "Skipped"}
@@ -736,29 +742,36 @@ export default function Home() {
         </main>
       </div>
 
-        {showConfirm && (
+      {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6">
           <div className="w-full max-w-lg rounded-3xl border border-white/10 bg-slate-950 p-6">
-            <h3 className="text-xl font-semibold text-white">Confirm payment</h3>
+            <h3 className="text-xl font-semibold text-white">
+              Confirm payment
+            </h3>
             <p className="mt-2 text-sm text-slate-300">
               The agent will run the paid x402 chain and place the order.
             </p>
             <div className="mt-4 rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm">
               {cartItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between py-1">
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between py-1"
+                >
                   <span>{item.name}</span>
                   <span className="text-cyan-200/80">
-                    {item.qty} × ${item.price}
+                    {item.qty} × {item.price} ETH
                   </span>
                 </div>
               ))}
               <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
                 <span className="text-slate-400">Subtotal</span>
-                <span className="text-white">${cartSubtotal}</span>
+                <span className="text-white">
+                  {cartSubtotal.toFixed(3)} ETH
+                </span>
               </div>
               <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
                 <span>Paid chain fees</span>
-                <span>${projectedSpend}</span>
+                <span>{projectedSpend.toFixed(4)} ETH</span>
               </div>
             </div>
             <div className="mt-6 flex gap-3">
