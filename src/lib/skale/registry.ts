@@ -2,6 +2,34 @@ import { createWalletClient, http, publicActions, parseAbi } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { skaleChain } from "./chain";
 
+class Mutex {
+  private mutex = Promise.resolve();
+
+  lock(): PromiseLike<() => void> {
+    let begin: (unlock: () => void) => void = (unlock) => {};
+
+    this.mutex = this.mutex.then(() => {
+      return new Promise(begin);
+    });
+
+    return new Promise((res) => {
+      begin = res;
+    });
+  }
+
+  async dispatch<T>(fn: (() => T) | (() => PromiseLike<T>)): Promise<T> {
+    const unlock = await this.lock();
+    try {
+      return await fn();
+    } finally {
+      unlock();
+    }
+  }
+}
+
+// Global mutex for the serverless function environment (mostly works if container is reused)
+const globalMutex = new Mutex();
+
 const SPEND_REGISTRY_ABI = parseAbi([
   "function logSpend(string calldata stepId, uint256 amount, string calldata memo) external",
   "event SpendLogged(address indexed payer, string stepId, uint256 amount, string memo)",
@@ -23,20 +51,24 @@ export class SkaleRegistry {
   }
 
   async logSpend(stepId: string, amount: bigint, memo: string) {
-    console.log(`[SkaleRegistry] Logging spend: ${stepId}, ${amount}, ${memo}`);
-    try {
-      const hash = await this.client.writeContract({
-        address: this.contractAddress,
-        abi: SPEND_REGISTRY_ABI,
-        functionName: "logSpend",
-        args: [stepId, amount, memo],
-      });
-      console.log(`[SkaleRegistry] Spend logged. Tx: ${hash}`);
-      return hash;
-    } catch (error) {
-      console.error("[SkaleRegistry] Failed to log spend:", error);
-      // Don't throw, just log error so we don't block the main flow
-      return null;
-    }
+    return globalMutex.dispatch(async () => {
+      console.log(
+        `[SkaleRegistry] Logging spend: ${stepId}, ${amount}, ${memo}`,
+      );
+      try {
+        const hash = await this.client.writeContract({
+          address: this.contractAddress,
+          abi: SPEND_REGISTRY_ABI,
+          functionName: "logSpend",
+          args: [stepId, amount, memo],
+        });
+        console.log(`[SkaleRegistry] Spend logged. Tx: ${hash}`);
+        return hash;
+      } catch (error) {
+        console.error("[SkaleRegistry] Failed to log spend:", error);
+        // Don't throw, just log error so we don't block the main flow
+        return null;
+      }
+    });
   }
 }
