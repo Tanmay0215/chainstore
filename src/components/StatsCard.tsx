@@ -5,7 +5,7 @@ type StatsCardProps = {
     value: number;
     direction: "up" | "down";
   };
-  color?: "cyan" | "emerald" | "rose" | "amber";
+  color?: "cyan" | "emerald" | "rose" | "amber" | "indigo";
 };
 
 export default function StatsCard({
@@ -19,6 +19,7 @@ export default function StatsCard({
     emerald: "border-emerald-200/20 bg-emerald-500/5 text-emerald-200",
     rose: "border-rose-200/20 bg-rose-500/5 text-rose-200",
     amber: "border-amber-200/20 bg-amber-500/5 text-amber-200",
+    indigo: "border-indigo-200/20 bg-indigo-500/5 text-indigo-200",
   };
 
   return (
