@@ -3,6 +3,7 @@ import { ExactEvmScheme } from "@x402/evm";
 import { privateKeyToAccount } from "viem/accounts";
 import { createPublicClient, http } from "viem";
 import { skaleChain } from "../skale/chain";
+import { SkaleRegistry } from "../skale/registry";
 
 type AccessResult = {
   success: boolean;
@@ -14,15 +15,18 @@ export class X402Agent {
   private httpClient: x402HTTPClient;
   private walletAddress: string;
   private publicClient: ReturnType<typeof createPublicClient>;
+  private registry?: SkaleRegistry;
 
   private constructor(
     httpClient: x402HTTPClient,
     walletAddress: string,
     publicClient: ReturnType<typeof createPublicClient>,
+    registry?: SkaleRegistry,
   ) {
     this.httpClient = httpClient;
     this.walletAddress = walletAddress;
     this.publicClient = publicClient;
+    this.registry = registry;
   }
 
   static async create(privateKey: string): Promise<X402Agent> {
@@ -41,8 +45,17 @@ export class X402Agent {
       transport: http(),
     });
 
+    // Initialize SpendRegistry if contract address is available
+    let registry;
+    if (process.env.SPEND_REGISTRY_CONTRACT) {
+      registry = new SkaleRegistry(
+        privateKey,
+        process.env.SPEND_REGISTRY_CONTRACT,
+      );
+    }
+
     console.log(`[X402Agent] Initialized with wallet: ${account.address}`);
-    return new X402Agent(httpClient, account.address, publicClient);
+    return new X402Agent(httpClient, account.address, publicClient, registry);
   }
 
   async accessResource(url: string): Promise<AccessResult> {
@@ -131,6 +144,19 @@ export class X402Agent {
 
       const data = await paidResponse.json();
       console.log("[X402Agent] Resource accessed successfully after payment!");
+
+      // Log spend on SKALE
+      if (this.registry) {
+        // Extract amount from payment payload or use default if not easily accessible
+        // For now logging 1 token as placeholder, or exact amount if we can parse it
+        // The payment payload structure depends on the x402 implementation
+        const amount = paymentRequired.accepts[0].amount || BigInt(0);
+        await this.registry.logSpend(
+          url.split("/").pop() || "unknown-step",
+          BigInt(amount),
+          `Paid for resource: ${url}`,
+        );
+      }
 
       return { success: true, data };
     } catch (error) {
