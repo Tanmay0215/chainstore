@@ -5,22 +5,22 @@ const pricing: Record<
   { price: number; description: string; payload: Record<string, unknown> }
 > = {
   quote: {
-    price: 4,
+    price: 0.0004,
     description: "Dynamic price quote for cart items",
     payload: { items: 3, subtotal: 34, discount: 2 },
   },
   reserve: {
-    price: 7,
+    price: 0.0007,
     description: "Inventory reservation hold",
     payload: { holds: 3, holdMinutes: 20 },
   },
   checkout: {
-    price: 6,
+    price: 0.0006,
     description: "Checkout processing fee",
     payload: { orderId: "ord_1024", total: 38 },
   },
   fulfill: {
-    price: 5,
+    price: 0.0005,
     description: "Fulfillment + shipping label",
     payload: { shipmentId: "shp_3341", etaDays: 3 },
   },

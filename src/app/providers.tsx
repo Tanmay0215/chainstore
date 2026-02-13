@@ -21,27 +21,29 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       const { WagmiAdapter } = require("@reown/appkit-adapter-wagmi");
       const { mainnet, sepolia } = require("wagmi/chains");
       const { http } = require("viem");
+      const { skaleChain } = require("@/lib/skale/chain");
 
       const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID;
       const metadata = {
-        name: "Signal-to-Campaign",
-        description: "Paid toolchain GTM agent",
+        name: "Agentic Commerce",
+        description: "AI-powered commerce on SKALE",
         url: "http://localhost:3000",
         icons: ["https://walletconnect.com/walletconnect-logo.png"],
       };
 
       const wagmiAdapter = new WagmiAdapter({
         projectId,
-        networks: [mainnet, sepolia],
+        networks: [mainnet, sepolia, skaleChain],
         transports: {
           [mainnet.id]: http(),
           [sepolia.id]: http(),
+          [skaleChain.id]: http(),
         },
       });
 
       createAppKit({
         adapters: [wagmiAdapter],
-        networks: [mainnet, sepolia],
+        networks: [mainnet, sepolia, skaleChain],
         projectId,
         metadata,
       });
