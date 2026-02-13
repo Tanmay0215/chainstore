@@ -24,7 +24,6 @@ Crucially, **every step is a paid API call** gated by **x402** (HTTP 402 Payment
 - **Supabase Backend**:
     - **Real-time Database**: Persists carts, orders, and inventory.
     - **Receipt Logging**: Every micro-payment is recorded for transparency.
-- **Wallet Connection**: Integrated with **Reown AppKit** for seamless crypto wallet connectivity.
 - **Modern UI**: Built with **Next.js 16**, **React 19**, and **Tailwind CSS v4**.
 
 ## Vision
@@ -53,7 +52,6 @@ We are building the **Commerce Layer for AGI**.
 - **AI Model**: [Google Gemini](https://deepmind.google/technologies/gemini/)
 - **Payments**: [x402](https://x402.org/) (Micro-payments)
 - **Web3**:
-    - [Reown AppKit](https://reown.com/) (Wallet Connect)
     - [Wagmi](https://wagmi.sh/) & [Viem](https://viem.sh/)
 - **Contract Dev**: Hardhat
 
@@ -84,7 +82,6 @@ cp .env.example .env.local
 Update `.env.local` with your credentials:
 
 - `GEMINI_API_KEY`: Get from [Google AI Studio](https://aistudio.google.com/).
-- `NEXT_PUBLIC_REOWN_PROJECT_ID`: Get from [Reown Cloud](https://cloud.reown.com/).
 - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL.
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`: Your Supabase Anon Key.
 - `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase Service Role Key (for secure backend operations).

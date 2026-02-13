@@ -11,8 +11,6 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "@reown/appkit": "^1.8.17",
-    "@reown/appkit-adapter-wagmi": "^1.8.17",
     "@supabase/supabase-js": "^2.49.1",
     "@tanstack/react-query": "^5.90.20",
     "@x402/core": "^2.3.0",
