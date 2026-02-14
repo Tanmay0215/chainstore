@@ -15,9 +15,9 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Agentic Commerce",
+  title: "ChainStore",
   description:
-    "Agentic commerce site that chains paid tools with x402 + CDP Wallets.",
+    "ChainStore - Agentic commerce site that chains paid tools with x402 + CDP Wallets.",
 };
 
 export default function RootLayout({

@@ -1,5 +1,5 @@
 -- ============================================================================
--- Agentic Commerce - Database Seed Script
+-- ChainStore - Database Seed Script
 -- ============================================================================
 -- This script creates the database schema and seeds initial data for the
 -- agentic commerce application. It includes tables for receipts, cart items,

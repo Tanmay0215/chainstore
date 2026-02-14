@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Link2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { fetchWith402, shouldPayStep } from "@/lib/x402";
 import { supabaseClient } from "@/lib/supabase/client";
@@ -404,10 +405,10 @@ export default function Home() {
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 shadow-lg shadow-cyan-500/20">
-                <span className="font-bold text-white">X</span>
+                <Link2 className="h-5 w-5 text-white" />
               </div>
               <h1 className="text-xl font-bold tracking-tight text-white">
-                Agentic <span className="text-cyan-400">Commerce</span>
+                Chain<span className="text-cyan-400">Store</span>
               </h1>
             </div>
 

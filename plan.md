@@ -1,4 +1,4 @@
-# Hackathon Idea: "Agentic Commerce" x402 Storefront
+# Hackathon Idea: "ChainStore" x402 Storefront
 
 ## One-liner
 An autonomous commerce agent that assembles a cart, pays per-step via x402 (pricing, inventory hold, checkout, fulfillment), and returns a complete order trace with receipts and budget reasoning.
