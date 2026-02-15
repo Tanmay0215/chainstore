@@ -78,11 +78,11 @@ const products: Product[] = [
 
 export default function Home() {
   const [budget, setBudget] = useState(0.5);
-  const [targetCount, setTargetCount] = useState(3);
+  const [targetCount] = useState(3);
   const [minCartValue, setMinCartValue] = useState(0);
   const [trace, setTrace] = useState<TraceStep[]>([]);
   const [isRunning, setIsRunning] = useState(false);
-  const [spent, setSpent] = useState(0);
+  const [, setSpent] = useState(0);
   const [cart, setCart] = useState<Record<string, number>>({
     "desk-mat": 1,
     lamp: 1,
@@ -93,10 +93,10 @@ export default function Home() {
   const [authStatus, setAuthStatus] = useState<
     "idle" | "loading" | "error" | "ok"
   >("idle");
-  const [authMessage, setAuthMessage] = useState("");
+  const [, setAuthMessage] = useState("");
   const [cartLoaded, setCartLoaded] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [errors, setErrors] = useState<string[]>([]);
+  const [, setErrors] = useState<string[]>([]);
   const [toast, setToast] = useState<{
     message: string;
     type: "ok" | "error";
@@ -152,7 +152,9 @@ export default function Home() {
 
   useEffect(() => {
     if (!authUserId) {
-      setCartLoaded(false);
+      if (cartLoaded) {
+        setTimeout(() => setCartLoaded(false), 0);
+      }
       return;
     }
 
@@ -181,7 +183,7 @@ export default function Home() {
     };
 
     loadCart();
-  }, [authUser]);
+  }, [authUser, authUserId, cartLoaded]);
 
   useEffect(() => {
     if (!authUserId || !cartLoaded) return;
@@ -234,6 +236,9 @@ export default function Home() {
     setAuthMessage("");
     const { error } = await supabaseClient.auth.signInWithOtp({
       email: authEmail,
+      options: {
+        emailRedirectTo: window.location.origin,
+      },
     });
     if (error) {
       setAuthStatus("error");
@@ -318,7 +323,7 @@ export default function Home() {
           price: step.price,
           receiptId: payload?.receipt?.id,
         });
-      } catch (error) {
+      } catch {
         nextTrace.push({
           name: step.name,
           price: step.price,
@@ -518,7 +523,7 @@ export default function Home() {
                           {product.tag}
                         </span>
                         <span className="font-mono text-sm font-bold text-slate-200">
-                          {product.price} ETH
+                          {product.price} sFUEL
                         </span>
                       </div>
                       <h4 className="mt-4 text-lg font-bold text-white group-hover:text-cyan-200 transition-colors">
@@ -573,7 +578,7 @@ export default function Home() {
                               {item.name}
                             </span>
                             <span className="text-xs text-slate-500">
-                              {item.qty} × {item.price} ETH
+                              {item.qty} × {item.price} sFUEL
                             </span>
                           </div>
 
@@ -604,7 +609,7 @@ export default function Home() {
                       <div className="flex justify-between items-end mb-1">
                         <span className="text-sm text-slate-400">Subtotal</span>
                         <span className="text-2xl font-bold text-white tracking-tight">
-                          {cartSubtotal.toFixed(3)} ETH
+                          {cartSubtotal.toFixed(3)} sFUEL
                         </span>
                       </div>
                       <p className="text-right text-xs text-slate-500">
@@ -650,7 +655,7 @@ export default function Home() {
                   <div className="space-y-3">
                     <label className="block">
                       <span className="text-xs font-medium text-slate-400">
-                        Agent Budget (ETH)
+                        Agent Budget (sFUEL)
                       </span>
                       <input
                         type="number"
@@ -726,7 +731,7 @@ export default function Home() {
         onClose={() => setShowConfirm(false)}
         onConfirm={runChain}
         title="Authorize Agent Payment"
-        message={`This will authorize an autonomous agent to execute ${baseSteps.length} distinct transactions (Quote, Reserve, Checkout, Fulfill) on your behalf. Total estimated value: ${(cartSubtotal + projectedSpend).toFixed(4)} ETH.`}
+        message={`This will authorize an autonomous agent to execute ${baseSteps.length} distinct transactions (Quote, Reserve, Checkout, Fulfill) on your behalf. Total estimated value: ${(cartSubtotal + projectedSpend).toFixed(4)} sFUEL.`}
         confirmText="Start Agent"
       />
 

@@ -68,13 +68,17 @@ export default function ChatPage() {
   useEffect(() => {
     if (!userId) return;
     const loadCart = async () => {
-      const response = await fetch(`/api/cart?userId=${encodeURIComponent(userId)}`);
+      const response = await fetch(
+        `/api/cart?userId=${encodeURIComponent(userId)}`,
+      );
       if (!response.ok) return;
       const payload = await response.json();
       const nextCart: Record<string, number> = {};
-      (payload.items ?? []).forEach((item: { productId: string; qty: number }) => {
-        nextCart[item.productId] = item.qty;
-      });
+      (payload.items ?? []).forEach(
+        (item: { productId: string; qty: number }) => {
+          nextCart[item.productId] = item.qty;
+        },
+      );
       setCart(nextCart);
     };
     loadCart();
@@ -117,7 +121,12 @@ export default function ChatPage() {
 
   const signIn = async () => {
     if (!email) return;
-    await supabaseClient.auth.signInWithOtp({ email });
+    await supabaseClient.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: window.location.origin,
+      },
+    });
     setMessages((prev) => [
       ...prev,
       {
@@ -168,7 +177,10 @@ export default function ChatPage() {
     if (!userId || cartItems.length === 0) {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Cart is empty or you are not signed in." },
+        {
+          role: "assistant",
+          content: "Cart is empty or you are not signed in.",
+        },
       ]);
       return;
     }
@@ -357,7 +369,7 @@ export default function ChatPage() {
         ...prev,
         { role: "assistant", content: payload.text ?? "No response." },
       ]);
-    } catch (error) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: "Failed to reach the bot." },
@@ -411,83 +423,83 @@ export default function ChatPage() {
         </section>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
-        <section className="flex min-h-[420px] flex-col gap-4 rounded-3xl border border-white/10 bg-slate-950/60 p-6">
-          {messages.map((message, index) => (
-            <div
-              key={`${message.role}-${index}`}
-              className={`rounded-2xl border border-white/10 px-4 py-3 text-sm ${
-                message.role === "assistant"
-                  ? "bg-slate-900/70 text-slate-100"
-                  : "bg-cyan-500/10 text-cyan-100"
-              }`}
-            >
-              {message.role === "assistant" ? (
-                <ReactMarkdown className="prose prose-invert max-w-none prose-p:leading-relaxed prose-li:my-1 prose-strong:text-white">
-                  {message.content}
-                </ReactMarkdown>
-              ) : (
-                <p>{message.content}</p>
-              )}
-            </div>
-          ))}
-          {loading && (
-            <div className="rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-slate-300">
-              Thinking…
-            </div>
-          )}
-        </section>
-
-        <aside className="rounded-3xl border border-white/10 bg-slate-950/60 p-4 text-sm">
-          <h2 className="text-sm font-semibold text-slate-100">Cart</h2>
-          <p className="mt-1 text-xs text-slate-400">Chat-driven cart</p>
-          <div className="mt-4 space-y-2">
-            {cartItems.length === 0 && (
-              <p className="text-xs text-slate-500">Cart is empty.</p>
-            )}
-            {cartItems.map((item) => (
+          <section className="flex min-h-[420px] flex-col gap-4 rounded-3xl border border-white/10 bg-slate-950/60 p-6">
+            {messages.map((message, index) => (
               <div
-                key={item.id}
-                className="rounded-2xl border border-white/10 bg-slate-900/70 px-3 py-2"
+                key={`${message.role}-${index}`}
+                className={`rounded-2xl border border-white/10 px-4 py-3 text-sm ${
+                  message.role === "assistant"
+                    ? "bg-slate-900/70 text-slate-100"
+                    : "bg-cyan-500/10 text-cyan-100"
+                }`}
               >
-                <div className="flex items-center justify-between text-xs">
-                  <span>{item.name}</span>
-                  <span className="text-cyan-200/80">${item.lineTotal}</span>
-                </div>
-                <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>
-                    {item.qty} × ${item.price}
-                  </span>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => removeFromCart(item.id, 1)}
-                      className="rounded-full border border-white/10 px-2 py-1"
-                    >
-                      -
-                    </button>
-                    <button
-                      onClick={() => addToCart(item.id, 1)}
-                      className="rounded-full border border-white/10 px-2 py-1"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
+                {message.role === "assistant" ? (
+                  <ReactMarkdown className="prose prose-invert max-w-none prose-p:leading-relaxed prose-li:my-1 prose-strong:text-white">
+                    {message.content}
+                  </ReactMarkdown>
+                ) : (
+                  <p>{message.content}</p>
+                )}
               </div>
             ))}
-          </div>
-          <div className="mt-4 rounded-2xl border border-white/10 bg-slate-900/70 px-3 py-2 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-slate-400">Subtotal</span>
-              <span className="text-slate-100">${cartSubtotal}</span>
+            {loading && (
+              <div className="rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-slate-300">
+                Thinking…
+              </div>
+            )}
+          </section>
+
+          <aside className="rounded-3xl border border-white/10 bg-slate-950/60 p-4 text-sm">
+            <h2 className="text-sm font-semibold text-slate-100">Cart</h2>
+            <p className="mt-1 text-xs text-slate-400">Chat-driven cart</p>
+            <div className="mt-4 space-y-2">
+              {cartItems.length === 0 && (
+                <p className="text-xs text-slate-500">Cart is empty.</p>
+              )}
+              {cartItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="rounded-2xl border border-white/10 bg-slate-900/70 px-3 py-2"
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span>{item.name}</span>
+                    <span className="text-cyan-200/80">${item.lineTotal}</span>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>
+                      {item.qty} × ${item.price}
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => removeFromCart(item.id, 1)}
+                        className="rounded-full border border-white/10 px-2 py-1"
+                      >
+                        -
+                      </button>
+                      <button
+                        onClick={() => addToCart(item.id, 1)}
+                        className="rounded-full border border-white/10 px-2 py-1"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-          <button
-            onClick={clearCart}
-            className="mt-3 w-full rounded-full border border-white/10 px-3 py-2 text-xs text-slate-200 hover:border-cyan-200/60"
-          >
-            Clear cart
-          </button>
-        </aside>
+            <div className="mt-4 rounded-2xl border border-white/10 bg-slate-900/70 px-3 py-2 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Subtotal</span>
+                <span className="text-slate-100">${cartSubtotal}</span>
+              </div>
+            </div>
+            <button
+              onClick={clearCart}
+              className="mt-3 w-full rounded-full border border-white/10 px-3 py-2 text-xs text-slate-200 hover:border-cyan-200/60"
+            >
+              Clear cart
+            </button>
+          </aside>
         </div>
 
         <div className="flex flex-col gap-3 rounded-3xl border border-white/10 bg-slate-950/60 p-4">

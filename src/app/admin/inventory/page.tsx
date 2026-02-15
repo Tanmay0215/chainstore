@@ -32,16 +32,6 @@ export default function AdminInventoryPage() {
     type: "ok" | "error";
   } | null>(null);
 
-  useEffect(() => {
-    loadInventory();
-  }, []);
-
-  useEffect(() => {
-    if (!toast) return;
-    const timeout = setTimeout(() => setToast(null), 3500);
-    return () => clearTimeout(timeout);
-  }, [toast]);
-
   const loadInventory = async () => {
     const response = await fetch("/api/inventory");
     if (!response.ok) {
@@ -53,6 +43,10 @@ export default function AdminInventoryPage() {
     setItems(payload.items ?? []);
     setLoading(false);
   };
+
+  useEffect(() => {
+    loadInventory();
+  }, []);
 
   const startEdit = (item: InventoryItem) => {
     setEditingId(item.id);

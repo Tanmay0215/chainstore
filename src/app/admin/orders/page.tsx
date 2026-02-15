@@ -20,26 +20,20 @@ export default function AdminOrdersPage() {
   } | null>(null);
 
   useEffect(() => {
+    const loadOrders = async () => {
+      const response = await fetch("/api/admin-orders");
+      if (!response.ok) {
+        setToast({ message: "Failed to load orders", type: "error" });
+        setLoading(false);
+        return;
+      }
+      const payload = await response.json();
+      setOrders(payload.orders ?? []);
+      setLoading(false);
+    };
+
     loadOrders();
   }, []);
-
-  useEffect(() => {
-    if (!toast) return;
-    const timeout = setTimeout(() => setToast(null), 3500);
-    return () => clearTimeout(timeout);
-  }, [toast]);
-
-  const loadOrders = async () => {
-    const response = await fetch("/api/admin-orders");
-    if (!response.ok) {
-      setToast({ message: "Failed to load orders", type: "error" });
-      setLoading(false);
-      return;
-    }
-    const payload = await response.json();
-    setOrders(payload.orders ?? []);
-    setLoading(false);
-  };
 
   const updateOrderStatus = async (orderId: string, status: string) => {
     const response = await fetch("/api/admin-orders", {

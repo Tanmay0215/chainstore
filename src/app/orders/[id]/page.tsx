@@ -65,9 +65,7 @@ export default function OrderDetailPage({
         </div>
 
         <div className="mt-8 rounded-3xl border border-white/10 bg-slate-950/60 p-6">
-          {loading && (
-            <p className="text-sm text-slate-400">Loading order…</p>
-          )}
+          {loading && <p className="text-sm text-slate-400">Loading order…</p>}
           {!loading && !order && (
             <p className="text-sm text-slate-400">Order not found.</p>
           )}
@@ -91,7 +89,7 @@ export default function OrderDetailPage({
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm">
                   <p className="text-xs text-slate-400">Total</p>
-                  <p className="mt-2 text-white">${order.total}</p>
+                  <p className="mt-2 text-white">{order.total} sFUEL</p>
                 </div>
               </div>
               <div className="mt-6">
@@ -106,7 +104,7 @@ export default function OrderDetailPage({
                     >
                       <span>{item.product_id}</span>
                       <span className="text-cyan-200/80">
-                        {item.qty} × ${item.price}
+                        {item.qty} × {item.price} sFUEL
                       </span>
                     </div>
                   ))}

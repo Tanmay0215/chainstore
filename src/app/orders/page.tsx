@@ -48,7 +48,9 @@ export default function OrdersPage() {
         return;
       }
 
-      const response = await fetch(`/api/orders?userId=${encodeURIComponent(id)}`);
+      const response = await fetch(
+        `/api/orders?userId=${encodeURIComponent(id)}`,
+      );
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
         setError(payload.error ?? "Failed to load orders");
@@ -110,7 +112,7 @@ export default function OrdersPage() {
                 </div>
                 <div className="mt-3 flex items-center justify-between">
                   <span className="text-lg font-semibold text-white">
-                    ${order.total}
+                    {order.total} sFUEL
                   </span>
                   <span className="rounded-full border border-amber-200/40 px-3 py-1 text-xs text-amber-100">
                     {order.status}

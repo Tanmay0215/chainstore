@@ -24,24 +24,24 @@ export default function AdminReceiptsPage() {
   const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
+    const loadReceipts = async () => {
+      const url =
+        filter === "all"
+          ? "/api/admin-receipts"
+          : `/api/admin-receipts?stepId=${filter}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        setLoading(false);
+        return;
+      }
+      const payload = await response.json();
+      setReceipts(payload.receipts ?? []);
+      setStats(payload.stats ?? null);
+      setLoading(false);
+    };
+
     loadReceipts();
   }, [filter]);
-
-  const loadReceipts = async () => {
-    const url =
-      filter === "all"
-        ? "/api/admin-receipts"
-        : `/api/admin-receipts?stepId=${filter}`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      setLoading(false);
-      return;
-    }
-    const payload = await response.json();
-    setReceipts(payload.receipts ?? []);
-    setStats(payload.stats ?? null);
-    setLoading(false);
-  };
 
   if (loading) {
     return (
@@ -81,7 +81,7 @@ export default function AdminReceiptsPage() {
               Total Revenue
             </p>
             <p className="mt-3 text-3xl font-semibold text-white">
-              ${stats.totalRevenue}
+              {stats.totalRevenue} sFUEL
             </p>
           </div>
           <div className="rounded-2xl border border-amber-200/20 bg-amber-500/5 p-5">
@@ -89,10 +89,10 @@ export default function AdminReceiptsPage() {
               Avg per Receipt
             </p>
             <p className="mt-3 text-3xl font-semibold text-white">
-              $
               {stats.totalReceipts > 0
                 ? (stats.totalRevenue / stats.totalReceipts).toFixed(2)
-                : "0.00"}
+                : "0.00"}{" "}
+              sFUEL
             </p>
           </div>
         </div>
@@ -179,7 +179,7 @@ export default function AdminReceiptsPage() {
                 {receipt.step_id}
               </span>
               <span className="text-right font-semibold text-emerald-200">
-                ${receipt.price}
+                {receipt.price} sFUEL
               </span>
               <span
                 className={`rounded-full border px-3 py-1 text-xs ${
