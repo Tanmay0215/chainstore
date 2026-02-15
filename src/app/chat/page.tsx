@@ -4,26 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { supabaseClient } from "@/lib/supabase/client";
 import { fetchWith402 } from "@/lib/x402";
+import { getProducts, type Product } from "@/lib/products";
 
 type Message = {
   role: "user" | "assistant";
   content: string;
 };
-
-type Product = {
-  id: string;
-  name: string;
-  price: number;
-};
-
-const products: Product[] = [
-  { id: "desk-mat", name: "Wool Desk Mat", price: 18 },
-  { id: "lamp", name: "Focus Lamp", price: 22 },
-  { id: "headset", name: "Studio Headset", price: 28 },
-  { id: "mug", name: "Thermal Mug", price: 14 },
-  { id: "notebook", name: "Analog Notebook", price: 12 },
-  { id: "stand", name: "Laptop Stand", price: 24 },
-];
 
 const baseSteps = [
   { id: "quote", name: "Dynamic Price Quote", price: 4 },
@@ -33,6 +19,7 @@ const baseSteps = [
 ];
 
 export default function ChatPage() {
+  const [products, setProducts] = useState<Product[]>([]);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -40,6 +27,10 @@ export default function ChatPage() {
         "Hi — I can help assemble a remote office kit. Ask for a bundle or type `add 1 desk mat`.",
     },
   ]);
+
+  useEffect(() => {
+    getProducts().then(setProducts);
+  }, []);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");

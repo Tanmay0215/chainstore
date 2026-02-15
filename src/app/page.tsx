@@ -23,61 +23,11 @@ const baseSteps = [
   { id: "fulfill", name: "Fulfillment", price: 0.0005 },
 ];
 
-type Product = {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  tag: string;
-};
-
-const products: Product[] = [
-  {
-    id: "desk-mat",
-    name: "Wool Desk Mat",
-    description: "Soft grip surface, 80x35cm",
-    price: 0.018,
-    tag: "Workspace",
-  },
-  {
-    id: "lamp",
-    name: "Focus Lamp",
-    description: "Adjustable warm light",
-    price: 0.022,
-    tag: "Lighting",
-  },
-  {
-    id: "headset",
-    name: "Studio Headset",
-    description: "Noise isolation + mic",
-    price: 0.028,
-    tag: "Audio",
-  },
-  {
-    id: "mug",
-    name: "Thermal Mug",
-    description: "Stays hot for 6 hours",
-    price: 0.014,
-    tag: "Comfort",
-  },
-  {
-    id: "notebook",
-    name: "Analog Notebook",
-    description: "Grid pages, 120 sheets",
-    price: 0.012,
-    tag: "Focus",
-  },
-  {
-    id: "stand",
-    name: "Laptop Stand",
-    description: "Aluminum, 6 height levels",
-    price: 0.024,
-    tag: "Ergonomics",
-  },
-];
+import { getProducts, type Product } from "@/lib/products";
 
 export default function Home() {
   const [budget, setBudget] = useState(0.5);
+  const [products, setProducts] = useState<Product[]>([]);
   const [targetCount] = useState(3);
   const [minCartValue, setMinCartValue] = useState(0);
   const [trace, setTrace] = useState<TraceStep[]>([]);
@@ -110,6 +60,10 @@ export default function Home() {
     const timeout = setTimeout(() => setToast(null), 3500);
     return () => clearTimeout(timeout);
   }, [toast]);
+
+  useEffect(() => {
+    getProducts().then(setProducts);
+  }, []);
 
   const projectedSpend = useMemo(
     () => baseSteps.reduce((sum, step) => sum + step.price, 0),
@@ -455,7 +409,7 @@ export default function Home() {
                   <div className="flex items-center gap-2">
                     <input
                       type="email"
-                      placeholder="Email for magic link"
+                      placeholder="Enter Email"
                       value={authEmail}
                       onChange={(e) => setAuthEmail(e.target.value)}
                       className="rounded-full border border-white/10 bg-slate-900/50 px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:border-cyan-500/50 focus:outline-none w-40"
@@ -515,7 +469,7 @@ export default function Home() {
                     key={product.id}
                     className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-white/5 bg-gradient-to-b from-white/5 to-transparent p-6 transition-all duration-300 hover:border-cyan-500/30 hover:shadow-[0_0_30px_-10px_rgba(34,211,238,0.2)]"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                     <div>
                       <div className="flex items-start justify-between">
